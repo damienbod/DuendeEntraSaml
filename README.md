@@ -2,15 +2,15 @@
 
 ## Setup Duende IDP as Saml Service Provider, Users in Entra ID 
 
-![SAML with EntraID Users](https://github.com/damienbod/DuendeEntraSaml/blob/main/images/idp-saml-entra-identities.drawio.png)
-
 External Identity Providers (Users in third party system like Entra ID or other systems)
+
+![SAML with EntraID Users](https://github.com/damienbod/DuendeEntraSaml/blob/main/images/idp-saml-entra-identities.drawio.png)
 
 ## Setup Duende as SAML Identity Provider, Users in Duende IDP
 
-![SAML with Duende Users](https://github.com/damienbod/DuendeEntraSaml/blob/main/images/idp-identities-saml-entra.drawio.png)
-
 Clients use Duende Identity to authenticate. 
+
+![SAML with Duende Users](https://github.com/damienbod/DuendeEntraSaml/blob/main/images/idp-identities-saml-entra.drawio.png)
 
 ## Links
 
