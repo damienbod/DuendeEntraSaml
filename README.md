@@ -2,7 +2,7 @@
 
 ## Setup Duende IDP as Saml Service Provider  
 
-External Identity Providers (Users in third party system like Enrta ID)
+External Identity Providers (Users in third party system like Entra ID or other systems)
 
 ## Setup Duende as SAML Identity Provider
 
@@ -21,3 +21,9 @@ https://github.com/Sustainsys/Saml2
 https://learn.microsoft.com/en-us/entra/architecture/auth-saml
 
 https://learn.microsoft.com/en-us/entra/identity/saas-apps/saml-toolkit-tutorial
+
+https://docs.duendesoftware.com/identityserver/usermanagement/getting-started/
+
+https://docs.duendesoftware.com/identityserver/usermanagement/identityserver-integration/
+
+https://zitadel.com/docs/guides/integrate/identity-providers/azure-ad-saml
