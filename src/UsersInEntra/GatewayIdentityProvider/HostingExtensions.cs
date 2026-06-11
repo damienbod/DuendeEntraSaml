@@ -53,7 +53,7 @@ internal static class HostingExtensions
 
         builder.Services.AddDistributedMemoryCache();
 
-        var jwksPrivatePem = builder.Configuration.GetValue<string>("SigningCertificate");
+        var base64Cert = builder.Configuration.GetValue<string>("SigningCertificate");
 
         //var sp2CertBase64 = builder.Configuration["SigningCertificate"];
         //X509Certificate2? sp2SigningCert = !string.IsNullOrEmpty(sp2CertBase64)
@@ -67,9 +67,9 @@ internal static class HostingExtensions
             {
                 options.SignInScheme = "entraidsamlcookie";
                 options.SpEntityId = "https://sts.windows.net/7ff95b15-dc21-4ba6-bc92-824856578fc1/";
-                options.IdpEntityId = "https://login.microsoftonline.com/7ff95b15-dc21-4ba6-bc92-824856578fc1";
+                options.IdpEntityId = "https://sts.windows.net/7ff95b15-dc21-4ba6-bc92-824856578fc1/";
                 options.SingleSignOnServiceUrl = "https://login.microsoftonline.com/7ff95b15-dc21-4ba6-bc92-824856578fc1/saml2";
-                options.SigningCertificatesBase64 = [ jwksPrivatePem ];
+                options.SigningCertificatesBase64 = [ base64Cert ];
             });
 
         builder.Services.AddAuthentication()
