@@ -1,6 +1,7 @@
 using IdentityProvider.Data;
 using IdentityProvider.Models;
 using IdentityProvider.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Identity;
@@ -10,6 +11,7 @@ using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using NetEscapades.AspNetCore.SecurityHeaders.Infrastructure;
 using Serilog;
+using System.Security.Cryptography.X509Certificates;
 
 namespace IdentityProvider;
 
@@ -50,6 +52,25 @@ internal static class HostingExtensions
             .AddAspNetIdentity<ApplicationUser>();
 
         builder.Services.AddDistributedMemoryCache();
+
+        var jwksPrivatePem = builder.Configuration.GetValue<string>("SigningCertificate");
+
+        //var sp2CertBase64 = builder.Configuration["SigningCertificate"];
+        //X509Certificate2? sp2SigningCert = !string.IsNullOrEmpty(sp2CertBase64)
+        //    ? X509CertificateLoader.LoadCertificate(Convert.FromBase64String(sp2CertBase64))
+        //    : null;
+
+        // https://docs.duendesoftware.com/identityserver/ui/login/saml-provider/
+        // https://learn.microsoft.com/en-us/entra/identity/saas-apps/saml-toolkit-tutorial
+        builder.Services.AddAuthentication()
+            .AddSamlServiceProvider("entra-saml-idp", options =>
+            {
+                options.SignInScheme = "entraidsamlcookie";
+                options.SpEntityId = "https://sts.windows.net/7ff95b15-dc21-4ba6-bc92-824856578fc1/";
+                options.IdpEntityId = "https://login.microsoftonline.com/7ff95b15-dc21-4ba6-bc92-824856578fc1";
+                options.SingleSignOnServiceUrl = "https://login.microsoftonline.com/7ff95b15-dc21-4ba6-bc92-824856578fc1/saml2";
+                options.SigningCertificatesBase64 = [ jwksPrivatePem ];
+            });
 
         builder.Services.AddAuthentication()
             .AddMicrosoftIdentityWebApp(options =>
@@ -142,6 +163,14 @@ internal static class HostingExtensions
 
         app.MapRazorPages()
             .RequireAuthorization();
+
+        app.MapGet("/login/entra-saml", async (HttpContext context) =>
+        {
+            await context.ChallengeAsync("entra-saml-idp", new AuthenticationProperties
+            {
+                RedirectUri = "/" // where to go after successful login
+            });
+        });
 
         app.MapControllers();
         return app;

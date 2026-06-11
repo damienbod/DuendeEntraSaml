@@ -428,3 +428,5 @@ FodyWeavers.xsd
 *.msm
 *.msp
 /images/.$idp**
+/src/UsersInEntra/GatewayIdentityProvider/keys/**
+/src/LogFiles/**

@@ -31,3 +31,5 @@ https://docs.duendesoftware.com/identityserver/usermanagement/getting-started/
 https://docs.duendesoftware.com/identityserver/usermanagement/identityserver-integration/
 
 https://zitadel.com/docs/guides/integrate/identity-providers/azure-ad-saml
+
+https://learn.microsoft.com/en-us/entra/external-id/direct-federation
