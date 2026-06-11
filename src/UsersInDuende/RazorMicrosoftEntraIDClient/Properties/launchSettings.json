@@ -1,0 +1,12 @@
+﻿{
+  "profiles": {
+    "RazorMicrosoftEntraID": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "applicationUrl": "https://localhost:44397",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
