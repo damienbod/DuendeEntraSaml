@@ -2,6 +2,7 @@ using IdentityProvider.Data;
 using IdentityProvider.Models;
 using IdentityProvider.Services;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Identity;
@@ -11,11 +12,11 @@ using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using NetEscapades.AspNetCore.SecurityHeaders.Infrastructure;
 using Serilog;
-using System.Security.Cryptography.X509Certificates;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Sustainsys.Saml2;
 using Sustainsys.Saml2.AspNetCore2;
+using Sustainsys.Saml2.Configuration;
 using Sustainsys.Saml2.Metadata;
+using System.Security.Cryptography.X509Certificates;
 
 namespace IdentityProvider;
 
@@ -57,12 +58,14 @@ internal static class HostingExtensions
 
         builder.Services.AddDistributedMemoryCache();
 
-        var base64Cert = builder.Configuration.GetValue<string>("SigningCertificate");
-
-        var sp2CertBase64 = builder.Configuration["SigningCertificate"];
-        X509Certificate2? sp2SigningCert = !string.IsNullOrEmpty(sp2CertBase64)
-            ? X509CertificateLoader.LoadCertificate(Convert.FromBase64String(sp2CertBase64))
-            : null;
+        var signingCertificatePassword = builder.Configuration.GetValue<string>("SigningCertificatePassword");
+        X509Certificate2? samlSigningRsaCert = null;
+        // saml-signing-rsa.pfx
+        if (!string.IsNullOrEmpty(signingCertificatePassword))
+        {
+            var pfxBytes = File.ReadAllBytes("saml-signing-rsa.pfx");
+            samlSigningRsaCert = X509CertificateLoader.LoadPkcs12(pfxBytes, signingCertificatePassword);
+        }
 
         // https://docs.duendesoftware.com/identityserver/ui/login/saml-provider/
         // https://learn.microsoft.com/en-us/entra/identity/saas-apps/saml-toolkit-tutorial
@@ -73,16 +76,18 @@ internal static class HostingExtensions
                  options.SPOptions.EntityId = new EntityId("https://sts.windows.net/7ff95b15-dc21-4ba6-bc92-824856578fc1/");
                  options.SPOptions.ReturnUrl = new Uri("https://localhost:5021/");
 
-                 if (sp2SigningCert != null)
+                 if (samlSigningRsaCert != null)
                  {
                      options.SPOptions.ServiceCertificates.Add(
-                         new ServiceCertificate { Certificate = sp2SigningCert, Use = CertificateUse.Signing });
+                         new ServiceCertificate { Certificate = samlSigningRsaCert, Use = CertificateUse.Signing });
                  }
 
                  options.IdentityProviders.Add(new Sustainsys.Saml2.IdentityProvider(
-                     new EntityId("https://login.microsoftonline.com/7ff95b15-dc21-4ba6-bc92-824856578fc1/saml2"), options.SPOptions)
+                     new EntityId("https://sts.windows.net/7ff95b15-dc21-4ba6-bc92-824856578fc1/"), options.SPOptions)
                  {
-                     LoadMetadata = true
+                     MetadataLocation = "https://login.microsoftonline.com/7ff95b15-dc21-4ba6-bc92-824856578fc1/federationmetadata/2007-06/federationmetadata.xml",
+                     LoadMetadata = true,
+                     AllowUnsolicitedAuthnResponse = true,
                  });
              });
 

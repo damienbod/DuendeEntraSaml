@@ -37,3 +37,5 @@ https://learn.microsoft.com/en-us/entra/external-id/direct-federation
 https://github.com/jitbit/AspNetSaml
 
 https://github.com/Sustainsys/Saml2
+
+https://learn.microsoft.com/en-us/entra/architecture/auth-saml
