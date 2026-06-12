@@ -430,3 +430,5 @@ FodyWeavers.xsd
 /images/.$idp**
 /src/UsersInEntra/GatewayIdentityProvider/keys/**
 /src/LogFiles/**
+/src/GenerateCertiticate/rsa256-private.pem
+/src/GenerateCertiticate/rsa256-public.pem
