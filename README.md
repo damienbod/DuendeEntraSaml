@@ -33,3 +33,7 @@ https://docs.duendesoftware.com/identityserver/usermanagement/identityserver-int
 https://zitadel.com/docs/guides/integrate/identity-providers/azure-ad-saml
 
 https://learn.microsoft.com/en-us/entra/external-id/direct-federation
+
+https://github.com/jitbit/AspNetSaml
+
+https://github.com/Sustainsys/Saml2
