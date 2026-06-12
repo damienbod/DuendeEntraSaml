@@ -84,8 +84,6 @@ internal static class HostingExtensions
                      //AllowUnsolicitedAuthnResponse = true
                  };
 
-                //TryAddConfiguredSigningKeysFromMetadata(idp, samlMetadataLocation);
-
                  options.IdentityProviders.Add(idp);
              });
 
