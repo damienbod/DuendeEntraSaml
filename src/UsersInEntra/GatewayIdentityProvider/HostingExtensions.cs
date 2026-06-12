@@ -11,6 +11,11 @@ using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using NetEscapades.AspNetCore.SecurityHeaders.Infrastructure;
 using Serilog;
+using System.Security.Cryptography.X509Certificates;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Sustainsys.Saml2;
+using Sustainsys.Saml2.AspNetCore2;
+using Sustainsys.Saml2.Metadata;
 
 namespace IdentityProvider;
 
@@ -54,37 +59,35 @@ internal static class HostingExtensions
 
         var base64Cert = builder.Configuration.GetValue<string>("SigningCertificate");
 
-        //var sp2CertBase64 = builder.Configuration["SigningCertificate"];
-        //X509Certificate2? sp2SigningCert = !string.IsNullOrEmpty(sp2CertBase64)
-        //    ? X509CertificateLoader.LoadCertificate(Convert.FromBase64String(sp2CertBase64))
-        //    : null;
+        var sp2CertBase64 = builder.Configuration["SigningCertificate"];
+        X509Certificate2? sp2SigningCert = !string.IsNullOrEmpty(sp2CertBase64)
+            ? X509CertificateLoader.LoadCertificate(Convert.FromBase64String(sp2CertBase64))
+            : null;
 
         // https://docs.duendesoftware.com/identityserver/ui/login/saml-provider/
         // https://learn.microsoft.com/en-us/entra/identity/saas-apps/saml-toolkit-tutorial
         // https://github.com/Sustainsys/Saml2
-        //builder.Services.AddAuthentication()
-        //     .AddSaml2(options =>
-        //     {
-        //         options.SPOptions.EntityId = new EntityId("https://localhost:5002");
-        //         options.SPOptions.ReturnUrl = new Uri("https://localhost:5002/");
+        builder.Services.AddAuthentication()
+             .AddSaml2(options =>
+             {
+                 options.SPOptions.EntityId = new EntityId("https://localhost:5002");
+                 options.SPOptions.ReturnUrl = new Uri("https://localhost:5002/");
 
-        //         // Load SP signing certificate from environment variable (base64 PFX)
-        //         var spCertPfxBase64 = builder.Configuration["SpSigningCertificatePfx"];
-        //         var spCertPassword = builder.Configuration["SpSigningCertificatePassword"];
-        //         if (!string.IsNullOrEmpty(spCertPfxBase64))
-        //         {
-        //             var pfxBytes = Convert.FromBase64String(spCertPfxBase64);
-        //             var cert = X509CertificateLoader.LoadPkcs12(pfxBytes, spCertPassword);
-        //             options.SPOptions.ServiceCertificates.Add(
-        //                 new ServiceCertificate { Certificate = cert, Use = CertificateUse.Signing });
-        //         }
+                 // Load SP signing certificate from environment variable (base64 PFX)
+                 var spCertPfxBase64 = builder.Configuration["SpSigningCertificatePfx"];
+                 var spCertPassword = builder.Configuration["SpSigningCertificatePassword"];
+                 if (sp2SigningCert != null)
+                 {
+                     options.SPOptions.ServiceCertificates.Add(
+                         new ServiceCertificate { Certificate = sp2SigningCert, Use = CertificateUse.Signing });
+                 }
 
-        //         options.IdentityProviders.Add(new IdentityProvider(
-        //             new EntityId("https://localhost:5001/Saml2"), options.SPOptions)
-        //         {
-        //             LoadMetadata = true
-        //         });
-        //     });
+                 options.IdentityProviders.Add(new Sustainsys.Saml2.IdentityProvider(
+                     new EntityId("https://localhost:5001/Saml2"), options.SPOptions)
+                 {
+                     LoadMetadata = true
+                 });
+             });
 
         //.AddSamlServiceProvider("entra-saml-idp", options =>
         //{
