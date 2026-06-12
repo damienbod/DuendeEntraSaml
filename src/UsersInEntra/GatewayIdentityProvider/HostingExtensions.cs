@@ -68,14 +68,11 @@ internal static class HostingExtensions
         // https://learn.microsoft.com/en-us/entra/identity/saas-apps/saml-toolkit-tutorial
         // https://github.com/Sustainsys/Saml2
         builder.Services.AddAuthentication()
-             .AddSaml2(options =>
+             .AddSaml2("entra-saml-idp", options =>
              {
-                 options.SPOptions.EntityId = new EntityId("https://localhost:5002");
-                 options.SPOptions.ReturnUrl = new Uri("https://localhost:5002/");
+                 options.SPOptions.EntityId = new EntityId("https://sts.windows.net/7ff95b15-dc21-4ba6-bc92-824856578fc1/");
+                 options.SPOptions.ReturnUrl = new Uri("https://localhost:5021/");
 
-                 // Load SP signing certificate from environment variable (base64 PFX)
-                 var spCertPfxBase64 = builder.Configuration["SpSigningCertificatePfx"];
-                 var spCertPassword = builder.Configuration["SpSigningCertificatePassword"];
                  if (sp2SigningCert != null)
                  {
                      options.SPOptions.ServiceCertificates.Add(
@@ -83,7 +80,7 @@ internal static class HostingExtensions
                  }
 
                  options.IdentityProviders.Add(new Sustainsys.Saml2.IdentityProvider(
-                     new EntityId("https://localhost:5001/Saml2"), options.SPOptions)
+                     new EntityId("https://login.microsoftonline.com/7ff95b15-dc21-4ba6-bc92-824856578fc1/saml2"), options.SPOptions)
                  {
                      LoadMetadata = true
                  });
