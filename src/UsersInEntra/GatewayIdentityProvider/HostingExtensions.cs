@@ -67,6 +67,8 @@ internal static class HostingExtensions
             ?? $"https://sts.windows.net/{samlTenantId}/";
         var samlSpEntityId = builder.Configuration["Saml:SpEntityId"] ?? "https://localhost:5021/Saml2";
         var samlReturnUrl = builder.Configuration["Saml:ReturnUrl"] ?? "https://localhost:5021/";
+        var samlToolkitCertificatePath = Path.Combine(builder.Environment.ContentRootPath, "MicrosoftEntraSAMLToolkit.cer");
+        var samlIdentityProviderCertificate = LoadIdentityProviderCertificate(samlToolkitCertificatePath);
 
         // https://docs.duendesoftware.com/identityserver/ui/login/saml-provider/
         // https://learn.microsoft.com/en-us/entra/identity/saas-apps/saml-toolkit-tutorial
@@ -85,6 +87,19 @@ internal static class HostingExtensions
                      LoadMetadata = true,
                      //AllowUnsolicitedAuthnResponse = true
                  };
+
+                 if (samlIdentityProviderCertificate is not null)
+                 {
+                     idp.SigningKeys.AddConfiguredKey(samlIdentityProviderCertificate);
+                     Log.Information(
+                         "Loaded SAML signing certificate from {CertificatePath}. Thumbprint: {Thumbprint}",
+                         samlToolkitCertificatePath,
+                         samlIdentityProviderCertificate.Thumbprint);
+                 }
+                 else
+                 {
+                     Log.Warning("SAML signing certificate file not found or invalid: {CertificatePath}", samlToolkitCertificatePath);
+                 }
 
                  LoadIdentityProviderMetadata(idp, samlMetadataLocation);
 
@@ -220,6 +235,24 @@ internal static class HostingExtensions
         catch (Exception ex)
         {
             Log.Warning(ex, "Failed to load SAML IdP metadata from {MetadataLocation}", metadataLocation);
+        }
+    }
+
+    private static X509Certificate2? LoadIdentityProviderCertificate(string certificatePath)
+    {
+        try
+        {
+            if (!File.Exists(certificatePath))
+            {
+                return null;
+            }
+
+            return X509CertificateLoader.LoadCertificateFromFile(certificatePath);
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Failed to load SAML certificate from {CertificatePath}", certificatePath);
+            return null;
         }
     }
 }
