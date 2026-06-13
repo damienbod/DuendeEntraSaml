@@ -2,7 +2,6 @@ using IdentityProvider.Data;
 using IdentityProvider.Models;
 using IdentityProvider.Services;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Identity;
@@ -12,9 +11,7 @@ using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using NetEscapades.AspNetCore.SecurityHeaders.Infrastructure;
 using Serilog;
-using Sustainsys.Saml2;
 using Sustainsys.Saml2.AspNetCore2;
-using Sustainsys.Saml2.Configuration;
 using Sustainsys.Saml2.Metadata;
 using System.Security.Cryptography.X509Certificates;
 
