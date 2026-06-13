@@ -214,7 +214,8 @@ internal static class HostingExtensions
         {
             await context.ChallengeAsync(Saml2Defaults.Scheme, new AuthenticationProperties
             {
-                RedirectUri = "/ExternalLogin/Callback" // where to go after successful login
+                RedirectUri = "/ExternalLogin/Callback", // where to go after successful login
+                Items = { ["scheme"] = Saml2Defaults.Scheme }
             });
         });
 

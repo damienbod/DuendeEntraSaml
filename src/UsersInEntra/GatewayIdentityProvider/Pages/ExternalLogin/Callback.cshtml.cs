@@ -62,6 +62,7 @@ public class Callback : PageModel
         {
             throw new InvalidOperationException($"External authentication error: {result.Failure}");
         }
+
         var externalUser = result.Principal ??
             throw new InvalidOperationException("External authentication produced a null Principal");
 
