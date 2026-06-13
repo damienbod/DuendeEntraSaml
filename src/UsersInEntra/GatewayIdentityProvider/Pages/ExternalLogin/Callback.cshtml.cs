@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Sustainsys.Saml2.AspNetCore2;
 using System.Security.Claims;
 
 namespace IdentityProvider.Pages.ExternalLogin;
@@ -50,6 +51,11 @@ public class Callback : PageModel
         if (result.Succeeded != true)
         {
             result = await HttpContext.AuthenticateAsync("adminentraidcookie");
+        }
+
+        if (result.Succeeded != true)
+        {
+            result = await HttpContext.AuthenticateAsync("samlecookie");
         }
 
         if (result.Succeeded != true)

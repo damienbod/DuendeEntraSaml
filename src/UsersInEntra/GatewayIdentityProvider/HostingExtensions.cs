@@ -74,8 +74,10 @@ internal static class HostingExtensions
         // https://learn.microsoft.com/en-us/entra/identity/saas-apps/saml-toolkit-tutorial
         // https://github.com/Sustainsys/Saml2
         builder.Services.AddAuthentication()
+             .AddCookie("samlecookie")
              .AddSaml2(Saml2Defaults.Scheme, "entra-saml-idp", options =>
              {
+                 options.SignInScheme = "samlecookie";
                  options.SPOptions.ValidateCertificates = false;
                  options.SPOptions.EntityId = new EntityId(samlSpEntityId);
                  options.SPOptions.ReturnUrl = new Uri(samlReturnUrl);
@@ -212,7 +214,7 @@ internal static class HostingExtensions
         {
             await context.ChallengeAsync(Saml2Defaults.Scheme, new AuthenticationProperties
             {
-                RedirectUri = "/" // where to go after successful login
+                RedirectUri = "/ExternalLogin/Callback" // where to go after successful login
             });
         });
 
