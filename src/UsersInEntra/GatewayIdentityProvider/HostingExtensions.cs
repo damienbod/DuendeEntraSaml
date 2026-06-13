@@ -17,7 +17,6 @@ using Sustainsys.Saml2.AspNetCore2;
 using Sustainsys.Saml2.Configuration;
 using Sustainsys.Saml2.Metadata;
 using System.Security.Cryptography.X509Certificates;
-using System.Xml.Linq;
 
 namespace IdentityProvider;
 
@@ -59,7 +58,9 @@ internal static class HostingExtensions
 
         builder.Services.AddDistributedMemoryCache();
 
-        var samlTenantId = builder.Configuration["Saml:TenantId"] ?? builder.Configuration["Saml:TenantId"];
+        var samlTenantId = builder.Configuration["Saml:TenantId"]
+            ?? builder.Configuration["EntraIDAdmin:TenantId"]
+            ?? builder.Configuration["AzureAd:TenantId"];
         var samlMetadataLocation = builder.Configuration["Saml:MetadataLocation"]
             ?? $"https://login.microsoftonline.com/{samlTenantId}/federationmetadata/2007-06/federationmetadata.xml";
         var samlIdpEntityId = builder.Configuration["Saml:IdpEntityId"]
@@ -71,8 +72,9 @@ internal static class HostingExtensions
         // https://learn.microsoft.com/en-us/entra/identity/saas-apps/saml-toolkit-tutorial
         // https://github.com/Sustainsys/Saml2
         builder.Services.AddAuthentication()
-             .AddSaml2("entra-saml-idp", options =>
+             .AddSaml2(Saml2Defaults.Scheme, "entra-saml-idp", options =>
              {
+                 options.SPOptions.ValidateCertificates = false;
                  options.SPOptions.EntityId = new EntityId(samlSpEntityId);
                  options.SPOptions.ReturnUrl = new Uri(samlReturnUrl);
 
@@ -83,6 +85,8 @@ internal static class HostingExtensions
                      LoadMetadata = true,
                      //AllowUnsolicitedAuthnResponse = true
                  };
+
+                 LoadIdentityProviderMetadata(idp, samlMetadataLocation);
 
                  options.IdentityProviders.Add(idp);
              });
@@ -191,7 +195,7 @@ internal static class HostingExtensions
 
         app.MapGet("/login/entra-saml", async (HttpContext context) =>
         {
-            await context.ChallengeAsync("entra-saml-idp", new AuthenticationProperties
+            await context.ChallengeAsync(Saml2Defaults.Scheme, new AuthenticationProperties
             {
                 RedirectUri = "/" // where to go after successful login
             });
@@ -201,36 +205,21 @@ internal static class HostingExtensions
         return app;
     }
 
-    private static void TryAddConfiguredSigningKeysFromMetadata(Sustainsys.Saml2.IdentityProvider idp, string metadataLocation)
+    private static void LoadIdentityProviderMetadata(Sustainsys.Saml2.IdentityProvider idp, string metadataLocation)
     {
         try
         {
-            var metadata = XDocument.Load(metadataLocation);
-            XNamespace md = "urn:oasis:names:tc:SAML:2.0:metadata";
-            XNamespace ds = "http://www.w3.org/2000/09/xmldsig#";
+            var metadata = MetadataLoader.LoadIdp(metadataLocation);
+            idp.ReadMetadata(metadata);
 
-            var signingCerts = metadata
-                .Descendants(md + "IDPSSODescriptor")
-                .Descendants(md + "KeyDescriptor")
-                .Where(k =>
-                {
-                    var use = (string?)k.Attribute("use");
-                    return string.IsNullOrWhiteSpace(use) || use.Equals("signing", StringComparison.OrdinalIgnoreCase);
-                })
-                .Descendants(ds + "X509Certificate")
-                .Select(c => c.Value?.Trim())
-                .Where(v => !string.IsNullOrWhiteSpace(v))
-                .Distinct(StringComparer.Ordinal);
-
-            foreach (var signingCert in signingCerts)
-            {
-                var cert = X509CertificateLoader.LoadCertificate(Convert.FromBase64String(signingCert!));
-                idp.SigningKeys.AddConfiguredKey(cert);
-            }
+            Log.Information(
+                "Loaded SAML metadata from {MetadataLocation}. Signing key count: {SigningKeyCount}",
+                metadataLocation,
+                idp.SigningKeys.Count());
         }
         catch (Exception ex)
         {
-            Log.Warning(ex, "Failed to pre-load SAML metadata signing keys from {MetadataLocation}", metadataLocation);
+            Log.Warning(ex, "Failed to load SAML IdP metadata from {MetadataLocation}", metadataLocation);
         }
     }
 }
