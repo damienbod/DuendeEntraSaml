@@ -6,6 +6,8 @@ External Identity Providers (Users in third party system like Entra ID or other 
 
 ![SAML with EntraID Users](https://github.com/damienbod/DuendeEntraSaml/blob/main/images/idp-saml-entra-identities.drawio.png)
 
+[Implement SAML as an external provider in an ASP.NET Core Identity application using Duende as an OIDC server](https://damienbod.com)
+
 ## Setup Duende as SAML Identity Provider, Users in Duende IDP
 
 Clients use Duende Identity to authenticate. 
