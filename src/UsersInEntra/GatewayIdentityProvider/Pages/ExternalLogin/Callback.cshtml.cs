@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Sustainsys.Saml2.AspNetCore2;
 using System.Security.Claims;
 
 namespace IdentityProvider.Pages.ExternalLogin;
@@ -55,7 +54,7 @@ public class Callback : PageModel
 
         if (result.Succeeded != true)
         {
-            result = await HttpContext.AuthenticateAsync("samlecookie");
+            result = await HttpContext.AuthenticateAsync("samlcookie");
         }
 
         if (result.Succeeded != true)
@@ -127,6 +126,7 @@ public class Callback : PageModel
         // delete temporary cookie used during external authentication
         await HttpContext.SignOutAsync("entraidcookie");
         await HttpContext.SignOutAsync("adminentraidcookie");
+        await HttpContext.SignOutAsync("samlcookie");
 
         // retrieve return URL
         var returnUrl = result.Properties.Items["returnUrl"] ?? "~/";

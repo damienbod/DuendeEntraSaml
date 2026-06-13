@@ -74,10 +74,10 @@ internal static class HostingExtensions
         // https://learn.microsoft.com/en-us/entra/identity/saas-apps/saml-toolkit-tutorial
         // https://github.com/Sustainsys/Saml2
         builder.Services.AddAuthentication()
-             .AddCookie("samlecookie")
+             .AddCookie("samlcookie")
              .AddSaml2(Saml2Defaults.Scheme, "entra-saml-idp", options =>
              {
-                 options.SignInScheme = "samlecookie";
+                 options.SignInScheme = "samlcookie";
                  options.SPOptions.ValidateCertificates = false;
                  options.SPOptions.EntityId = new EntityId(samlSpEntityId);
                  options.SPOptions.ReturnUrl = new Uri(samlReturnUrl);
@@ -107,16 +107,6 @@ internal static class HostingExtensions
 
                  options.IdentityProviders.Add(idp);
              });
-
-        //.AddSamlServiceProvider("entra-saml-idp", options =>
-        //{
-        //    //options.SignInScheme = "Identity.External";
-        //    options.SpEntityId = "https://sts.windows.net/7ff95b15-dc21-4ba6-bc92-824856578fc1/";
-        //    options.IdpEntityId = "https://sts.windows.net/7ff95b15-dc21-4ba6-bc92-824856578fc1/";
-        //    options.SingleSignOnServiceUrl = "https://login.microsoftonline.com/7ff95b15-dc21-4ba6-bc92-824856578fc1/saml2";
-        //    options.SigningCertificatesBase64 = [ base64Cert ];
-
-        //});
 
         builder.Services.AddAuthentication()
             .AddMicrosoftIdentityWebApp(options =>
