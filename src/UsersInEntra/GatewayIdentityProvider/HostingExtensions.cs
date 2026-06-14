@@ -55,15 +55,14 @@ internal static class HostingExtensions
 
         builder.Services.AddDistributedMemoryCache();
 
-        var samlTenantId = builder.Configuration["Saml:TenantId"]
-            ?? builder.Configuration["EntraIDAdmin:TenantId"]
-            ?? builder.Configuration["AzureAd:TenantId"];
+        var samlTenantId = builder.Configuration["Saml:TenantId"];
         var samlMetadataLocation = builder.Configuration["Saml:MetadataLocation"]
             ?? $"https://login.microsoftonline.com/{samlTenantId}/federationmetadata/2007-06/federationmetadata.xml";
-        var samlIdpEntityId = builder.Configuration["Saml:IdpEntityId"]
-            ?? $"https://sts.windows.net/{samlTenantId}/";
+        var samlIdpEntityId = builder.Configuration["Saml:IdpEntityId"] ?? $"https://sts.windows.net/{samlTenantId}/";
         var samlSpEntityId = builder.Configuration["Saml:SpEntityId"] ?? "https://localhost:5021/Saml2";
         var samlReturnUrl = builder.Configuration["Saml:ReturnUrl"] ?? "https://localhost:5021/";
+
+        // Load this depending on your environment, change the code as required. For example, you can load it from Azure Key Vault or from a secure location.
         var samlToolkitCertificatePath = Path.Combine(builder.Environment.ContentRootPath, "MicrosoftEntraSAMLToolkit.cer");
         var samlIdentityProviderCertificate = LoadIdentityProviderCertificate(samlToolkitCertificatePath);
 

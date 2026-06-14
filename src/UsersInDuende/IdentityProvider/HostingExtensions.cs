@@ -51,15 +51,15 @@ internal static class HostingExtensions
             [
                 new SamlServiceProvider
                 {
-                    EntityId = "YOUR_HUBSPOT_AUDIENCE_URI",
-                    DisplayName = "HubSpot",
+                    EntityId = "--add-entity-id-saml-setup--",
+                    DisplayName = "Entra ID",
 
-                    // The ACS URL from HubSpot's SSO settings
+                    // The ACS URL 
                     AssertionConsumerServiceUrls =
                     [
                         new IndexedEndpoint
                         {
-                            Location = "YOUR_HUBSPOT_ACS_URL",
+                            Location = "add-acs-saml-setup",
                             Binding = SamlBinding.HttpPost,
                             Index = 0,
                             IsDefault = true
@@ -69,7 +69,7 @@ internal static class HostingExtensions
                     // HubSpot requires email-format NameID
                     DefaultNameIdFormat = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
 
-                    // Sign the assertion (HubSpot requirement)
+                    // Sign the assertion id required
                     SigningBehavior = SamlSigningBehavior.SignAssertion,
 
                     // Identity resources available for this SP
