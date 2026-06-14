@@ -432,3 +432,4 @@ FodyWeavers.xsd
 /src/LogFiles/**
 /src/GenerateCertiticate/rsa256-private.pem
 /src/GenerateCertiticate/rsa256-public.pem
+/src/UsersInEntra/GatewayIdentityProvider/MicrosoftEntraSAMLToolkit.cer
