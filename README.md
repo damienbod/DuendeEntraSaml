@@ -16,6 +16,7 @@ Clients use Duende Identity to authenticate.
 
 ## History
 
+- 2026-07-25 Updates packages
 - 2026-07-02 Updates packages
 
 ## Links
