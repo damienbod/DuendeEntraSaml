@@ -15,7 +15,7 @@ Clients use Duende Identity to authenticate.
 ![SAML with Duende Users](https://github.com/damienbod/DuendeEntraSaml/blob/main/images/idp-identities-saml-entra.drawio.png)
 
 ## History
-
+- 2026-10-24 Updates packages
 - 2026-07-25 Updates packages
 - 2026-07-02 Updates packages
 
